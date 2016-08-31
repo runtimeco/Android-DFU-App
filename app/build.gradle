@@ -35,11 +35,11 @@ dependencies {
     wearApp project(':wear')
 
     // The DFU Library is imported automatically from jcenter.
-    compile 'no.nordicsemi.android:dfu:0.6.3'
+    //compile 'no.nordicsemi.android:dfu:0.6.3'
     // If you want to make some changes in the DFU Library, clone the https://github.com/NordicSemiconductor/Android-DFU-Library project into DFULibrary folder,
     // add it as a module in Project Structure and uncomment the following line:
 
-    // compile project(':dfu')
+    compile project(':dfu')
 
     // Also uncomment selected lines in settings.gradle
 }

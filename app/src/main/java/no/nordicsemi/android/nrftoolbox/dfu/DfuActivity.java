@@ -520,13 +520,13 @@ public class DfuActivity extends AppCompatActivity implements LoaderCallbacks<Cu
 				break;
 		}
 		mFileSizeView.setText(getString(R.string.dfu_file_size_text, fileSize));
-		final String extension = mFileType == DfuService.TYPE_AUTO ? "(?i)ZIP" : "(?i)HEX|BIN"; // (?i) =  case insensitive
+		final String extension = mFileType == DfuService.TYPE_AUTO ? "(?i)ZIP" : "(?i)HEX|BIN|IMG"; // (?i) =  case insensitive
 		final boolean statusOk = mStatusOk = MimeTypeMap.getFileExtensionFromUrl(fileName).matches(extension);
 		mFileStatusView.setText(statusOk ? R.string.dfu_file_status_ok : R.string.dfu_file_status_invalid);
 		mUploadButton.setEnabled(mSelectedDevice != null && statusOk);
 
 		// Ask the user for the Init packet file if HEX or BIN files are selected. In case of a ZIP file the Init packets should be included in the ZIP.
-		if (statusOk && fileType != DfuService.TYPE_AUTO) {
+		if (statusOk && fileType != DfuService.TYPE_AUTO && !MimeTypeMap.getFileExtensionFromUrl(fileName).matches("(?i)IMG")) {
 			new AlertDialog.Builder(this).setTitle(R.string.dfu_file_init_title).setMessage(R.string.dfu_file_init_message)
 					.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
 						@Override
@@ -677,9 +677,11 @@ public class DfuActivity extends AppCompatActivity implements LoaderCallbacks<Cu
 		final DfuServiceInitiator starter = new DfuServiceInitiator(mSelectedDevice.getAddress())
 				.setDeviceName(mSelectedDevice.getName())
 				.setKeepBond(keepBond);
-		if (mFileType == DfuService.TYPE_AUTO)
+		if (mFileType == DfuService.TYPE_AUTO) {
 			starter.setZip(mFileStreamUri, mFilePath);
-		else {
+		} else if (mFileNameView.getText().toString().endsWith(".img")) {
+			starter.setNewtImage(mFileStreamUri, mFilePath);
+		} else {
 			starter.setBinOrHex(mFileType, mFileStreamUri, mFilePath).setInitFile(mInitFileStreamUri, mInitFilePath);
 		}
 		starter.start(this, DfuService.class);
